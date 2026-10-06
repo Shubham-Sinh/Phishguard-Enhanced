@@ -1,26 +1,30 @@
 from predicition_engine import predict_url
 
 
-urls = [
-    "https://google.com",
-    "http://192.168.1.10/login",
-    "https://secure-login.com/verify/account123"
-]
+def test_google_prediction():
+    result = predict_url("https://google.com")
+
+    assert result["url"] == "https://google.com"
+    assert result["normalized_url"] == "google.com"
+    assert result["prediction"] in [0, 1]
+    assert 0 <= result["legitimate_probability"] <= 100
+    assert 0 <= result["phishing_probability"] <= 100
+    assert result["risk_level"] in ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
 
 
-for url in urls:
+def test_ip_address_prediction():
+    result = predict_url("http://192.168.1.10/login")
 
-    result = predict_url(url)
+    assert result["prediction"] in [0, 1]
+    assert 0 <= result["legitimate_probability"] <= 100
+    assert 0 <= result["phishing_probability"] <= 100
 
-    print("\nURL:", result["url"])
-    print("Normalized:", result["normalized_url"])
-    print("Prediction:", result["prediction"])
-    print(
-        "Legitimate:",
-        f'{result["legitimate_probability"]:.2f}%'
+
+def test_suspicious_url_prediction():
+    result = predict_url(
+        "https://secure-login.com/verify/account123"
     )
-    print(
-        "Phishing:",
-        f'{result["phishing_probability"]:.2f}%'
-    )
-    print("Risk:", result["risk_level"])
+
+    assert result["prediction"] in [0, 1]
+    assert 0 <= result["legitimate_probability"] <= 100
+    assert 0 <= result["phishing_probability"] <= 100
